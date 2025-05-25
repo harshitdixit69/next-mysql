@@ -13,13 +13,51 @@ model User {
   email     String   @unique
   phone     String?
   address   String?  @db.Text
-  role      String   @default("USER")
+  role      Role     @default(USER)
   isActive  Boolean  @default(true)
+  department String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  assets    Asset[]  @relation("AssignedAssets")
+}
+
+model Asset {
+  id                Int       @id @default(autoincrement())
+  name             String
+  type             String
+  description      String?    @db.Text
+  status           AssetStatus @default(AVAILABLE)
+  location         String?
+  department       String?
+  purchaseDate     DateTime?
+  purchaseCost     Decimal?   @db.Decimal(10, 2)
+  vendor           String?
+  warrantyExpiration DateTime?
+  serialNumber     String?    @unique
+  barcode          String?    @unique
+  lastMaintenance  DateTime?
+  nextMaintenance  DateTime?
+  imageUrl         String?    @db.Text
+  assignedTo       User?      @relation("AssignedAssets", fields: [assignedUserId], references: [id])
+  assignedUserId   Int?
+  notes            String?    @db.Text
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  @@index([type])
+  @@index([status])
+  @@index([department])
+  @@index([assignedUserId])
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+enum AssetStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+  CHECKED_OUT
 }
