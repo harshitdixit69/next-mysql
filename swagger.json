@@ -11,9 +11,135 @@
       "description": "Local development server"
     }
   ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
   "paths": {
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register a new user",
+        "description": "Create a new user account",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "email", "password"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "john@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "your-password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login user",
+        "description": "Authenticate user and get JWT token",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "john@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "your-password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/assets": {
       "get": {
+        "tags": ["Assets"],
         "summary": "Get all assets",
         "description": "Retrieve a list of all assets",
         "responses": {
@@ -26,6 +152,16 @@
                   "items": {
                     "$ref": "#/components/schemas/Asset"
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -43,8 +179,9 @@
         }
       },
       "post": {
+        "tags": ["Assets"],
         "summary": "Create a new asset",
-        "description": "Create a new asset with the provided information",
+        "description": "Create a new asset with the provided information (Admin only)",
         "requestBody": {
           "required": true,
           "content": {
@@ -68,6 +205,26 @@
           },
           "400": {
             "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Admin access required",
             "content": {
               "application/json": {
                 "schema": {
@@ -485,6 +642,13 @@
     }
   },
   "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
     "schemas": {
       "User": {
         "type": "object",
@@ -746,6 +910,39 @@
           }
         },
         "required": ["name", "type"]
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "User ID"
+              },
+              "name": {
+                "type": "string",
+                "description": "User's full name"
+              },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "description": "User's email address"
+              },
+              "role": {
+                "type": "string",
+                "enum": ["USER", "ADMIN"],
+                "description": "User's role"
+              }
+            }
+          },
+          "token": {
+            "type": "string",
+            "description": "JWT token for authentication",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        }
       }
     }
   }
