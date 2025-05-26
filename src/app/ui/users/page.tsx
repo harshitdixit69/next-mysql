@@ -87,7 +87,7 @@ export default function HomePage() {
         setPage(page - 1);
         fetchUsers(page - 1, search);
       } else {
-        fetchUsers(page, search);
+        fetchUsers(page, search); 
       }
     } else {
       toast.error('Delete failed');

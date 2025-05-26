@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "User Management API",
-    "description": "API endpoints for managing users with CRUD operations",
+    "title": "Asset Management API",
+    "description": "API endpoints for managing users and assets with CRUD operations",
     "version": "1.0.0"
   },
   "servers": [
@@ -12,6 +12,203 @@
     }
   ],
   "paths": {
+    "/api/assets": {
+      "get": {
+        "summary": "Get all assets",
+        "description": "Retrieve a list of all assets",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Asset"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new asset",
+        "description": "Create a new asset with the provided information",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Asset created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Asset"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an asset",
+        "description": "Update an existing asset's information",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "description": "Asset ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Asset updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Asset"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an asset",
+        "description": "Delete an existing asset",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "description": "Asset ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Asset deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Asset deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/users": {
       "get": {
         "summary": "Get users with pagination and filters",
@@ -376,6 +573,179 @@
             "description": "Error message"
           }
         }
+      },
+      "Asset": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Dell XPS 15 Laptop"
+          },
+          "type": {
+            "type": "string",
+            "example": "Hardware"
+          },
+          "description": {
+            "type": "string",
+            "example": "High-performance developer laptop"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["AVAILABLE", "IN_USE", "MAINTENANCE", "RETIRED"],
+            "example": "AVAILABLE"
+          },
+          "location": {
+            "type": "string",
+            "example": "Main Office"
+          },
+          "department": {
+            "type": "string",
+            "example": "Engineering"
+          },
+          "purchaseDate": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-03-25T00:00:00.000Z"
+          },
+          "purchaseCost": {
+            "type": "string",
+            "example": "1899.99"
+          },
+          "vendor": {
+            "type": "string",
+            "example": "Dell"
+          },
+          "warrantyExpiration": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2027-03-25T00:00:00.000Z"
+          },
+          "serialNumber": {
+            "type": "string",
+            "example": "XPS15-2024-001"
+          },
+          "barcode": {
+            "type": "string",
+            "example": "DELL-XPS15-001"
+          },
+          "lastMaintenance": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-03-25T00:00:00.000Z"
+          },
+          "nextMaintenance": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-09-25T00:00:00.000Z"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "notes": {
+            "type": "string",
+            "example": "Assigned to senior developers"
+          },
+          "assignedUserId": {
+            "type": "integer",
+            "nullable": true,
+            "example": null
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["name", "type"]
+      },
+      "AssetInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Dell XPS 15 Laptop"
+          },
+          "type": {
+            "type": "string",
+            "example": "Hardware"
+          },
+          "description": {
+            "type": "string",
+            "example": "High-performance developer laptop"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["AVAILABLE", "IN_USE", "MAINTENANCE", "RETIRED"],
+            "example": "AVAILABLE"
+          },
+          "location": {
+            "type": "string",
+            "example": "Main Office"
+          },
+          "department": {
+            "type": "string",
+            "example": "Engineering"
+          },
+          "purchaseDate": {
+            "type": "string",
+            "format": "date",
+            "example": "2024-03-25"
+          },
+          "purchaseCost": {
+            "type": "number",
+            "format": "float",
+            "example": 1899.99
+          },
+          "vendor": {
+            "type": "string",
+            "example": "Dell"
+          },
+          "warrantyExpiration": {
+            "type": "string",
+            "format": "date",
+            "example": "2027-03-25"
+          },
+          "serialNumber": {
+            "type": "string",
+            "example": "XPS15-2024-001"
+          },
+          "barcode": {
+            "type": "string",
+            "example": "DELL-XPS15-001"
+          },
+          "lastMaintenance": {
+            "type": "string",
+            "format": "date",
+            "example": "2024-03-25"
+          },
+          "nextMaintenance": {
+            "type": "string",
+            "format": "date",
+            "example": "2024-09-25"
+          },
+          "image": {
+            "type": "string",
+            "format": "binary"
+          },
+          "notes": {
+            "type": "string",
+            "example": "Assigned to senior developers"
+          },
+          "assignedUserId": {
+            "type": "integer",
+            "example": 1
+          }
+        },
+        "required": ["name", "type"]
       }
     }
   }
